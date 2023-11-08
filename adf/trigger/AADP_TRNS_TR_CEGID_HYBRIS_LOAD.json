@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_CEGID_HYBRIS_LOAD",
+	"properties": {
+		"description": "Cegid Hybris and DWH reference tables load to STD Layer. Dependent UC -15,43 ",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 1,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-04-07T13:00:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

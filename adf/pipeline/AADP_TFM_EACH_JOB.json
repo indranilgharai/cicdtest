@@ -1,0 +1,433 @@
+{
+	"name": "AADP_TFM_EACH_JOB",
+	"properties": {
+		"activities": [
+			{
+				"name": "Process Job",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Initialise Log",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.10:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderStoredProcedureName": "[meta_audit].[sp_transform_run_job]",
+						"storedProcedureParameters": {
+							"JobID": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.JobID",
+									"type": "Expression"
+								}
+							},
+							"PipelineID": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.PipelineID",
+									"type": "Expression"
+								}
+							},
+							"ProcName": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.ProcName",
+									"type": "Expression"
+								}
+							},
+							"resetFlag": {
+								"type": "Boolean",
+								"value": {
+									"value": "@pipeline().parameters.reset_flag",
+									"type": "Expression"
+								}
+							},
+							"stage_number": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.stage_number",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "10:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Initialise Log",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[meta_audit].[sp_transform_job_initialize]",
+					"storedProcedureParameters": {
+						"BatchID": {
+							"value": {
+								"value": "@pipeline().parameters.BatchID",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"BatchStartTime": {
+							"value": null,
+							"type": "DateTime"
+						},
+						"DataDate": {
+							"value": null,
+							"type": "DateTime"
+						},
+						"FileName": {
+							"value": null,
+							"type": "String"
+						},
+						"JobControlID": {
+							"value": {
+								"value": "@pipeline().parameters.JobControlID",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"JobID": {
+							"value": {
+								"value": "@pipeline().parameters.JobID",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"PipelineID": {
+							"value": {
+								"value": "@pipeline().parameters.PipelineID",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": null,
+							"type": "String"
+						},
+						"Source": {
+							"value": null,
+							"type": "String"
+						},
+						"SourceStorageAccount": {
+							"value": null,
+							"type": "String"
+						},
+						"Target": {
+							"value": null,
+							"type": "String"
+						},
+						"TargetStorageAccount": {
+							"value": null,
+							"type": "String"
+						},
+						"ZoneName": {
+							"value": {
+								"value": "@pipeline().parameters.ZoneName",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_SYNAPSE_DWH",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Update Process Status",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Process Job",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@if(contains(activity('Process Job').output,'firstRow'),contains(activity('Process Job').output.firstRow.ProcessStatus,'Completed'),false)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Log Fail Task",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[meta_audit].[sp_transform_error_logging]",
+								"storedProcedureParameters": {
+									"BatchID": {
+										"value": {
+											"value": "@pipeline().parameters.BatchID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"ErrorCode": {
+										"value": {
+											"value": "@if(contains(activity('Process Job').output,'firstRow'),activity('Process Job').output.firstRow.ErrorNumber,'50010')\n",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ErrorDescription": {
+										"value": {
+											"value": "@if(contains(activity('Process Job').output,'firstRow'),activity('Process Job').output.firstRow.ErrorMessage,'Other errors such as - Process TimeOut')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ErrorType": {
+										"value": "Transformation",
+										"type": "String"
+									},
+									"JobControlID": {
+										"value": {
+											"value": "@pipeline().parameters.JobControlID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"JobID": {
+										"value": {
+											"value": "@pipeline().parameters.JobID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"PipelineID": {
+										"value": {
+											"value": "@pipeline().parameters.PipelineID",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ZoneName": {
+										"value": {
+											"value": "@pipeline().parameters.ZoneName",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_SYNAPSE_DWH",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Log Success Task",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Get Record Count",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[meta_audit].[sp_transform_update_load_status]",
+								"storedProcedureParameters": {
+									"BatchID": {
+										"value": {
+											"value": "@pipeline().parameters.BatchID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"FileName": {
+										"value": null,
+										"type": "String"
+									},
+									"FileTimeStamp": {
+										"value": null,
+										"type": "String"
+									},
+									"InputRowCount": {
+										"value": {
+											"value": "@activity('Get Record Count').output.firstRow.driver_read_count",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"JobControlID": {
+										"value": {
+											"value": "@pipeline().parameters.JobControlID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"JobID": {
+										"value": {
+											"value": "@pipeline().parameters.JobID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"LoadStatus": {
+										"value": "Completed",
+										"type": "String"
+									},
+									"MainFileArchived": {
+										"value": null,
+										"type": "String"
+									},
+									"MetadataFileInputRowCount": {
+										"value": null,
+										"type": "Int32"
+									},
+									"MetadataFileTargetRowCount": {
+										"value": null,
+										"type": "Int32"
+									},
+									"MetaDataFileTotalName": {
+										"value": null,
+										"type": "String"
+									},
+									"PipelineID": {
+										"value": {
+											"value": "@pipeline().parameters.PipelineID",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"TargetLoadCount": {
+										"value": {
+											"value": "@activity('Get Record Count').output.firstRow.target_write_count",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"ZoneName": {
+										"value": {
+											"value": "@pipeline().parameters.ZoneName",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_SYNAPSE_DWH",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Get Record Count",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.01:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlDWSource",
+									"sqlReaderQuery": {
+										"value": "select TOP 1 * \nfrom\n(\nselect TOP 1 driver_read_count, target_write_count, md_record_written_timestamp from [meta_ctl].[transform_count_record_table]\nwhere job_id=@{pipeline().parameters.JobID} \nand step_number=@{pipeline().parameters.stage_number}\nand md_record_written_timestamp>='@{activity('Process Job').output.firstRow.Updated_date}'\nUNION\nselect 0,0, getdate()-1\n) x\norder by md_record_written_timestamp desc;",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "AzureSynapseAnalyticsTable1",
+									"type": "DatasetReference"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"BatchID": {
+				"type": "int",
+				"defaultValue": 9000
+			},
+			"JobID": {
+				"type": "int",
+				"defaultValue": 9000
+			},
+			"PipelineID": {
+				"type": "string",
+				"defaultValue": "@Pipeline().RunID"
+			},
+			"ZoneName": {
+				"type": "string",
+				"defaultValue": "Transformation"
+			},
+			"JobControlID": {
+				"type": "int",
+				"defaultValue": 9000
+			},
+			"reset_flag": {
+				"type": "bool",
+				"defaultValue": false
+			},
+			"stage_number": {
+				"type": "int"
+			},
+			"ProcName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "AADP_TRANSFORMATION_PIPELINE"
+		},
+		"annotations": []
+	}
+}

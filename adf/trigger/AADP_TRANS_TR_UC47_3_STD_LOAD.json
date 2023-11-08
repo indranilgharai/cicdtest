@@ -1,0 +1,33 @@
+{
+	"name": "AADP_TRANS_TR_UC47_3_STD_LOAD",
+	"properties": {
+		"description": "STDload for Zednesk Trigger",
+		"annotations": [
+			"dev",
+			"prod",
+			"sit",
+			"uat"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7012"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 6,
+				"startTime": "2022-05-07T14:00:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

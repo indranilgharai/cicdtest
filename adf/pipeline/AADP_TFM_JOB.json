@@ -1,0 +1,134 @@
+{
+	"name": "AADP_TFM_JOB",
+	"properties": {
+		"activities": [
+			{
+				"name": "Process Job",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetJobLists",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetJobLists').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "Execute Each Job",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "AADP_TFM_EACH_JOB",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"BatchID": {
+										"value": "@item().BatchID",
+										"type": "Expression"
+									},
+									"JobID": {
+										"value": "@item().JobID",
+										"type": "Expression"
+									},
+									"PipelineID": {
+										"value": "@pipeline().parameters.PipelineID",
+										"type": "Expression"
+									},
+									"ZoneName": {
+										"value": "@item().ZoneName",
+										"type": "Expression"
+									},
+									"JobControlID": {
+										"value": "@item().JobControlID",
+										"type": "Expression"
+									},
+									"reset_flag": {
+										"value": "@item().reset_flag",
+										"type": "Expression"
+									},
+									"stage_number": {
+										"value": "@item().stage_number",
+										"type": "Expression"
+									},
+									"ProcName": {
+										"value": "@item().SourceFormatSubType",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "GetJobLists",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.10:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderStoredProcedureName": "[meta_audit].[sp_transform_get_job_list]",
+						"storedProcedureParameters": {
+							"BatchID": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.BatchID",
+									"type": "Expression"
+								}
+							},
+							"stage_number": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.stage_number",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"parameters": {
+			"BatchID": {
+				"type": "string"
+			},
+			"stage_number": {
+				"type": "string"
+			},
+			"PipelineID": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "AADP_TRANSFORMATION_PIPELINE"
+		},
+		"annotations": []
+	}
+}

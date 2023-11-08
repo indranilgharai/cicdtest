@@ -1,0 +1,18 @@
+job_id,job_name,description,usecase_tag
+1,job_cegid/hybris std load_uc15/43,Cegid/Hybris load the staging and Std layer for UC15&43,UC15-UC43
+2,job_sfmc_std_load_uc15/43,SFMC Std Layer SPs for UC15 & UC43,UC15-UC43
+3,job_fps_std_load_uc15/43,FPS Standard Layer  SPs for UC47,UC15-UC47
+4,job_std_purchase_uc15/43,Cegid-Hybris_purchase record,UC15-UC43
+5,job_cons_sales_detail,sales_detail_time_cons_load,UC15
+6,job_cons_customer,cons_custumer_47_1_load,UC47_1
+7,job_cons_customer_profile,cons_customer_profile_cons_load,UC43
+8,job_ref_load,ref_load,UC43_UC15
+10,job_fps_stage_restricted_to_std_restricted_pii_data_load,load fps PII data from stage_restricted layer to std_restricted,PII_data_load
+9,job_ref_std_load_uc40_41,reference std tables for uc 40_41,UC40_UC41
+11,job_std_load_uc44,netsuite std layer load for uc44,UC44
+12,job_cons_load_inventory_report,netsuite cons layer load for uc44,UC44
+13,job_sfmc_stage_restricted_to_std_restricted_pii_data_load,load sfmc PII data from stage_restricted layer to std_restricted,PII_data_load
+14,job_cons_supplychain_uc40,consumption tables load for UC 40,UC40
+15,job_dwh_rp_stage_restricted_to_std_restricted_pii_data_load,load dwh rp PII data from stage_restricted layer to std_restricted,PII_data_load
+16,job_cons_supplychain_uc41,consumption tables load for UC 41,UC41
+17,job_std_load_uc47_3,std load for uc47_3,UC47_3

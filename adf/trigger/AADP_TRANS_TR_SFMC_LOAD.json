@@ -1,0 +1,33 @@
+{
+	"name": "AADP_TRANS_TR_SFMC_LOAD",
+	"properties": {
+		"description": "SFMC tables Std layer load",
+		"annotations": [
+			"dev",
+			"prod",
+			"sit",
+			"uat"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7001"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-04-25T04:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

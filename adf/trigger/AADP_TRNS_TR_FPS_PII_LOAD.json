@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_FPS_PII_LOAD",
+	"properties": {
+		"description": "FPS PII tables load to Std layer",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 10,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-04-07T17:00:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

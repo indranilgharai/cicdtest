@@ -1,0 +1,41 @@
+{
+	"name": "AADP_TRANS_TR_CEGID_HYBRIS_LOAD",
+	"properties": {
+		"description": "Cegid and Hybris stage and Payment Transaction Std load - stage.line_item_union_sources ,stage.purchase_Record_union_sources, std.payment_transaction loads",
+		"annotations": [
+			"prod",
+			"uat"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7000"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-03-08T11:00:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						30
+					],
+					"hours": [
+						17,
+						1,
+						9
+					]
+				}
+			}
+		}
+	}
+}

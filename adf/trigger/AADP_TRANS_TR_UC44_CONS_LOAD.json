@@ -1,0 +1,33 @@
+{
+	"name": "AADP_TRANS_TR_UC44_CONS_LOAD",
+	"properties": {
+		"description": "Cons load for UC44",
+		"annotations": [
+			"dev",
+			"prod",
+			"sit",
+			"uat"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7011"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2023-03-08T01:00:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"name": "AADP_TRANS_TR_PURCHASE_LOAD",
+	"properties": {
+		"description": "Purchase_record and Purchase_record_line_item Std layer Load",
+		"annotations": [
+			"prod",
+			"uat"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7008"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-03-08T11:00:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"hours": [
+						18,
+						3,
+						11
+					]
+				}
+			}
+		}
+	}
+}

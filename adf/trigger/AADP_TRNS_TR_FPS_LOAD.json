@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_FPS_LOAD",
+	"properties": {
+		"description": "FPS Data load to STD layer. Dependent SPs - UC15/43",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 3,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-04-07T14:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

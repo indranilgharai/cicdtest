@@ -1,0 +1,42 @@
+{
+	"name": "AADP_TRANS_TR_UC1STORECONSKPI_LOAD",
+	"properties": {
+		"description": "to load \n[cons_retail].[store_consultant_kpi_consultant]\n[cons_retail].[store_consultant_kpi_consultant_weekly]\n[cons_retail].[store_consultant_kpi_consultant_monthly]\n[cons_retail].[store_consultant_kpi_location]\n[cons_retail].[store_consultant_kpi_location_weekly]\n[cons_retail].[store_consultant_kpi_location_monthly]\n[cons_retail].[store_sku_daily]\n[cons_retail].[store_sku_monthly]\n[cons_retail].[store_sku_weekly]\n[cons_retail].[store_kpi_daily]\n[cons_retail].[store_kpi_hourly]\n[cons_retail].[store_kpi_monthly]\n[cons_retail].[store_kpi_weekly]\n tables",
+		"annotations": [
+			"dev",
+			"prod"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7026"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-03-08T11:00:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						30
+					],
+					"hours": [
+						18,
+						3,
+						11,
+						23
+					]
+				}
+			}
+		}
+	}
+}

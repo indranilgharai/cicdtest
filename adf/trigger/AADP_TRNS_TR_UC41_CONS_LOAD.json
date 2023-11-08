@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_UC41_CONS_LOAD",
+	"properties": {
+		"description": "Trigger to load CONS table of UC41",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 16,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-05-07T21:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

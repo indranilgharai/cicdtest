@@ -1,0 +1,32 @@
+{
+	"name": "AADP_TRANS_TR_UC2UC3_MANUAL_LOAD",
+	"properties": {
+		"description": "to load std.sp_itemcost_excluded_stock_list\nstd.sp_dimadjustment_reasons\nstd.sp_dimstocktake_schedule\nstd.sp_offcycle_stock",
+		"annotations": [
+			"dev",
+			"uat",
+			"prod"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7030"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-03-08T09:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

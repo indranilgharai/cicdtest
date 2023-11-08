@@ -1,0 +1,33 @@
+{
+	"name": "AADP_TRANS_TR_ZENDESK_CONS_LOAD",
+	"properties": {
+		"description": "Trigger for Zendesk Consumption load",
+		"annotations": [
+			"dev",
+			"prod",
+			"sit",
+			"uat"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7031"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 6,
+				"startTime": "2022-04-27T03:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

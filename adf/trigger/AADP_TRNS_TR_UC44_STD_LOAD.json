@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_UC44_STD_LOAD",
+	"properties": {
+		"description": "STD layer load for UC44",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 11,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-05-06T20:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

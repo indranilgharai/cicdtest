@@ -1,0 +1,28 @@
+{
+	"name": "AADP_TRANS_TR_SALES_DETAIL_CONS_LOAD",
+	"properties": {
+		"description": "Trigger to load sales table in cons layer",
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7021"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2023-03-08T19:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

@@ -1,0 +1,156 @@
+{
+	"name": "AADP_TFM_MAIN",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetBatchLists",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Set Batch Start Time",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderStoredProcedureName": "[meta_audit].[sp_transform_get_batch_list]",
+						"storedProcedureParameters": {
+							"BatchID": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.BatchID",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Process Batch",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetBatchLists",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetBatchLists').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Execute Stage",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "AADP_TFM_STAGE",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"BatchID": {
+										"value": "@item().BatchID",
+										"type": "Expression"
+									},
+									"PipelineID": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set Batch Start Time",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "BatchStartTime",
+					"value": {
+						"value": "@utcnow()",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Batch End Time",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Process Batch",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.01:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": {
+							"value": "UPDATE [meta_audit].[transform_load_status]\nSET BatchStartTime = convert(datetimeoffset,'@{variables('BatchStartTime')}') \n, BatchEndTime = SYSUTCDATETIME()\nWHERE PipelineID = '@{pipeline().RunId}'\n\nSELECT 1\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"BatchID": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"BatchStartTime": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "AADP_TRANSFORMATION_PIPELINE"
+		},
+		"annotations": []
+	}
+}

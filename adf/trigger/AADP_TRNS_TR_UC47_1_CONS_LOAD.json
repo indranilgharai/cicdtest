@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_UC47_1_CONS_LOAD",
+	"properties": {
+		"description": "Consumption Layer Customer data Load - UC47_1",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 6,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-04-07T22:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

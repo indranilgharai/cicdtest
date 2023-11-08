@@ -1,0 +1,44 @@
+name: 'Getting a token for accessing the resouce'
+description: 'Get Azure Access Token for an specific resource'
+inputs:
+  creds:
+    description: 'Azure credentials for the service principal to log in'
+    required: true
+  client_id:
+    description: 'Azure credentials for the service principal to log in'
+    required: false
+  client_secret:
+    description: 'Azure credentials for the service principal to log in'
+    required: false    
+  resource-url:
+    description: 'Resource url for that you are requesting token'
+    required: true
+  resource-type-name:
+    description: 'Optional resouce type name, supported values: AadGraph, AnalysisServices, Arm, Attestation, Batch, DataLake, KeyVault, OperationalInsights, ResourceManager, Storage, Synapse. Default value is Arm if not specified.'
+    default: 'Arm'
+outputs:
+  token:
+    description: "Authentication Token"
+    value: ${{ steps.adquire-token.outputs.token }}
+runs:
+  using: "composite"
+  steps:
+    - name: Logining in into Azure
+      uses: Azure/login@v1
+      with:
+        creds: ${{ inputs.creds }}
+        enable-AzPSSession: true
+    - id: adquire-token
+      name: Adquiring access token
+      shell: pwsh
+      run: |
+        $client_id = ('${{ inputs.creds }}' | ConvertFrom-Json).clientId
+        $client_secret = ('${{ inputs.creds }}' | ConvertFrom-Json).clientSecret
+        $resourceToken = ${{ github.workspace }}/scripts/actions/azure-resource-login/Get-AzResourceAccessToken.ps1  `
+                                -ClientID "$client_id"  `
+                                -ClientSecret "$client_secret"  `
+                                -ResourceUrl "${{ inputs.resource-url }}"  `
+                                -ResourceTypeName "${{ inputs.resource-type-name }}"
+        
+        write-host "::debug::Setting 'token' variable to $resourceToken"
+        write-host "::set-output name=token::$resourceToken"

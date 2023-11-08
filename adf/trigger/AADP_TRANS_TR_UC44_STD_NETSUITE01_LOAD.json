@@ -1,0 +1,30 @@
+{
+	"name": "AADP_TRANS_TR_UC44_STD_NETSUITE01_LOAD",
+	"properties": {
+		"description": "to execute std netsuite inventory table",
+		"annotations": [
+			"prod"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7009"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2023-03-09T21:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

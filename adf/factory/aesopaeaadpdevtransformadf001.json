@@ -1,0 +1,9 @@
+{
+	"name": "aesopaeaadpdevtransformadf001",
+	"location": "australiaeast",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "be943a9c-70a7-42da-bfb0-7b8af343b222",
+		"tenantId": "e8af0d80-2a51-4212-b96a-fc48553fd73b"
+	}
+}

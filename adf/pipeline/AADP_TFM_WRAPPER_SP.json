@@ -1,0 +1,143 @@
+{
+	"name": "AADP_TFM_WRAPPER_SP",
+	"properties": {
+		"description": "Pipeline to trigger the Wrapper SP for orchestrating the transformation framework",
+		"activities": [
+			{
+				"name": "WrapperSP",
+				"description": "Wrapper SP for orchestrating the transformation framework",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "meta_audit.sp_tfm_wrapper",
+					"storedProcedureParameters": {
+						"jobid": {
+							"value": {
+								"value": "@pipeline().parameters.job_id",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"pipelineid": {
+							"value": {
+								"value": "@concat('''',pipeline().RunId, '''')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"reset": {
+							"value": {
+								"value": "@pipeline().parameters.reset",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_SYNAPSE_DWH",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "GetJobStatus",
+				"description": "Lookup block to check the job status from table: transformation_job_stats",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "WrapperSP",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": {
+							"value": "select job_status from meta_audit.transform_job_stats where job_id='@{pipeline().parameters.job_id}' and job_start_time=(select max(job_start_time) from meta_audit.transform_job_stats where job_id='@{pipeline().parameters.job_id}')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "JobStatusCheck",
+				"description": "If the wrapper SP for the job has succeeded then pipeline will be successful else pipeline should fail",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetJobStatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(activity('GetJobStatus').output.firstrow.job_status,'SUCCESS')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "JobStatus_FAIL",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Job execution Failed",
+								"errorCode": "0000000"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "JobStatus_SUCCESS",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"job_id": {
+				"type": "int"
+			},
+			"reset": {
+				"type": "int"
+			}
+		},
+		"folder": {
+			"name": "AADP_TRANSFORMATION_PIPELINE"
+		},
+		"annotations": []
+	}
+}

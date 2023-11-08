@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "value": "aesopaeaadpdevtransformadf001"
+        },
+        "LS_SYNAPSE_DWH_connectionString": {
+            "value": "Server=aesopaeaadpdevsynws001.sql.azuresynapse.net;Initial Catalog=aesopaeaadpdevdedpool001;Persist Security Info=False;User ID=etl_user;"
+        },
+        "LS_AKV_SECURITY_properties_typeProperties_baseUrl": {
+            "value": "https://aesaeiadpdeappkvt001.vault.azure.net/"
+        },
+        "aesop-aadp-ir_properties_typeProperties_linkedInfo_resourceId": {
+            "value": "/subscriptions/c82e510a-5caf-41c3-9bab-cb6c00a36fac/resourcegroups/aesop-ae-ddnt-aadp-dev-integration-rg-001/providers/Microsoft.DataFactory/factories/aesopaeaadpdevingestionadf001/integrationruntimes/aesop-aadp-ir"
+        }
+    }
+    
+}

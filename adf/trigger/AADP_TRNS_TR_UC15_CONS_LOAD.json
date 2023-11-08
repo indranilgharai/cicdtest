@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_UC15_CONS_LOAD",
+	"properties": {
+		"description": "Sales Detail Time Consumption layer load - UC15",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 5,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-04-07T16:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

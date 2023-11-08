@@ -1,0 +1,32 @@
+{
+	"name": "AADP_TRANS_TR_UC2UC3_CONS_LOAD",
+	"properties": {
+		"description": "to load cons_retail.sp_current_store_soh\ncons_retail.sp_Monthly_Store_Stock_Rate\ncons_retail.sp_store_inventory_adjustments\ncons_retail.sp_store_stocktake",
+		"annotations": [
+			"dev",
+			"uat",
+			"prod"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7028"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-03-09T23:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

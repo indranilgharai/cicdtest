@@ -1,0 +1,12 @@
+<Project Sdk="MSBuild.Sdk.SqlProj/1.17.3">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<SqlServerVersion>SqlDw</SqlServerVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<!-- <Content Remove=".\Scripts\PreDeployment\begin_transaction.sql" />
+		<PreDeploy Include=".\Scripts\PreDeployment\begin_transaction.sql" /> -->
+		<Content Remove=".\Scripts\PostDeployment\external_tables.sql" />
+		<PostDeploy Include=".\Scripts\PostDeployment\external_tables.sql" />
+	</ItemGroup>
+</Project>

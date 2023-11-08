@@ -1,0 +1,33 @@
+{
+	"name": "AADP_TRANS_TR_UC15_UC43_CONS_LOAD",
+	"properties": {
+		"description": "customer_profile consumption load",
+		"annotations": [
+			"dev",
+			"prod",
+			"sit",
+			"uat"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7010"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2023-03-07T06:00:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

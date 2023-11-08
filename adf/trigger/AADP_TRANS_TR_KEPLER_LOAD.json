@@ -1,0 +1,31 @@
+{
+	"name": "AADP_TRANS_TR_KEPLER_LOAD",
+	"properties": {
+		"description": "to load std.kepler_incoming",
+		"annotations": [
+			"dev",
+			"prod"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7024"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 8,
+				"startTime": "2023-01-30T22:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

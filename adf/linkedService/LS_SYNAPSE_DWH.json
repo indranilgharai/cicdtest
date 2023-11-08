@@ -1,0 +1,22 @@
+{
+	"name": "LS_SYNAPSE_DWH",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDW",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=aesopaeaadpdevsynws001.sql.azuresynapse.net;Initial Catalog=aesopaeaadpdevdedpool001;User ID=etl_user",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_AKV_SECURITY",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "synapse-dataloaduser-password"
+			}
+		},
+		"connectVia": {
+			"referenceName": "aesop-aadp-ir",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

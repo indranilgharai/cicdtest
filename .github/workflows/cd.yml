@@ -1,0 +1,271 @@
+name: CD
+
+on:
+    pull_request:
+        branches:
+            - main
+            - develop
+            - uat
+            - sit
+        types: [closed]
+
+    workflow_dispatch:
+
+
+jobs:
+    #########################
+    # Read envs from dotenv #
+    #########################
+    setup-env-vars:
+        runs-on: ubuntu-latest
+        outputs:
+            DEPLOY_ENV: ${{ steps.setenv.outputs.DEP_ENV }}
+            ENVIRONMENT_PREFIX: ${{ steps.dotenv.outputs.ENVIRONMENT_PREFIX }}
+            AZURE_CREDENTIALS: AZURE_CREDENTIALS_${{ steps.setenv.outputs.DEP_ENV }}
+            ADF_RG: ${{ steps.dotenv.outputs.ADF_RG }}
+            ADF_NAME: ${{ steps.dotenv.outputs.ADF_NAME }}
+            SUBSCRIPTION_ID: ${{ steps.dotenv.outputs.SUBSCRIPTION_ID }}
+            STORAGE_ACCOUNT: ${{ steps.dotenv.outputs.STORAGE_ACCOUNT }}
+            SA_RG: ${{ steps.dotenv.outputs.SA_RG }}
+            CI_ID: ${{ steps.get_run_id.outputs.run_id }}
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set Deploy env based on branch
+              id: setenv
+              run: |
+                  branch=${GITHUB_BASE_REF##*/}
+                  if [[ "$branch" == "develop" ]]
+                  then
+                      echo ::set-output name=DEP_ENV::"DEV"
+                  elif [[ "$branch" == "sit" ]]
+                  then
+                      echo ::set-output name=DEP_ENV::"SIT"
+                  elif [[ "$branch" == "uat" ]]
+                  then
+                      echo ::set-output name=DEP_ENV::"UAT"        
+                  elif [[ "$branch" == "main" ]]
+                  then
+                      echo ::set-output name=DEP_ENV::"PROD"
+                  else
+                      echo ::set-output name=DEP_ENV::"DEV"
+                  fi
+
+
+            - name: Read Custom Environment variables
+              id: dotenv
+              uses: falti/dotenv-action@v0.2.7
+              with:
+                  path: envs/${{ steps.setenv.outputs.DEP_ENV }}.env
+
+            - name: Get Run ID
+              id: get_run_id
+              run: |
+                echo "::set-output name=run_id::$(\
+                  gh run list \
+                    --workflow ci.yml \
+                    --json conclusion,headSha,status,databaseId \
+                    --jq ".[] | select( .conclusion == \"success\" and .headSha == \"${{github.event.pull_request.head.sha}}\") | .databaseId" \
+                )" 
+              env:
+                GITHUB_TOKEN: ${{ github.token }}      
+
+    #########################################
+    # Filter path to run only relevant jobs #
+    #########################################
+    paths-filter:
+        runs-on: ubuntu-latest
+        needs: setup-env-vars
+        outputs:
+            adf: ${{ steps.filter.outputs.adf }}
+            sql: ${{ steps.filter.outputs.sql }}
+        steps:
+            - uses: actions/checkout@v2
+            - uses: dorny/paths-filter@v2
+              id: filter
+              with:
+                  base: ${{ github.ref }}
+                  list-files: none
+                  filters: |
+                      adf:
+                        - 'adf/**'
+                        - 'envs/**'
+                        - '.github/**'
+                      sql:
+                        - 'sql/**'
+                        - 'envs/**'
+                        - '.github/**'
+    SQL-Data-Seed:
+            runs-on: ubuntu-latest
+            needs:
+                - paths-filter
+                - setup-env-vars
+            outputs:
+                sa_ip: ${{ steps.pre-deploy.outputs.ip }}    
+            env:
+                STORAGE_ACCOUNT: ${{ needs.setup-env-vars.outputs.STORAGE_ACCOUNT }}
+                SA_RG: ${{ needs.setup-env-vars.outputs.SA_RG }}
+                AZURE_CREDENTIALS: ${{ needs.setup-env-vars.outputs.AZURE_CREDENTIALS }}
+                ENVIRONMENT_PREFIX: ${{ needs.setup-env-vars.outputs.ENVIRONMENT_PREFIX }}    
+
+            if: ${{ needs.paths-filter.outputs.sql == 'true' }}    
+            steps:
+                - uses: actions/checkout@v2
+                - name: Login to Azure Subscription
+                  uses: Azure/login@v1 
+                  with: 
+                    creds: ${{ secrets[env.AZURE_CREDENTIALS] }}
+                    enable-AzPSSession: true
+
+                - name: Pre-Deployment Script
+                  id: pre-deploy
+                  uses: azure/powershell@v1
+                  with:
+                    inlineScript: |
+                      $ip = ${{ github.workspace }}/scripts/actions/manage-sql-firewall/manage-firewall.ps1 `
+                            -resourceGroupName ${{ env.SA_RG }} `
+                            -storageAccountName ${{ env.STORAGE_ACCOUNT }} `
+                            -predeployment $true
+                      echo "::set-output name=ip::$ip"
+                      echo "$ip"
+                    azPSVersion: "latest"
+
+                - name: Upload Seed Data
+                  uses: azure/CLI@v1
+                  with:
+                    azcliversion: 2.34.1
+                    inlineScript: |
+                      chmod +x $GITHUB_WORKSPACE/scripts/upload_seed_data_adls.sh
+                      $GITHUB_WORKSPACE/scripts/upload_seed_data_adls.sh ${{ env.STORAGE_ACCOUNT }} ${{ env.SA_RG }} ${{ env.ENVIRONMENT_PREFIX }}
+
+                - name: Post-Deployment Script
+                  uses: azure/powershell@v1
+                  if: always()
+                  with:
+                    inlineScript: ./scripts/actions/manage-sql-firewall/manage-firewall.ps1 -resourceGroupName ${{ env.SA_RG }} -storageAccountName ${{ env.STORAGE_ACCOUNT }} -predeployment $false
+                    azPSVersion: "latest"
+
+
+    Deploy-SQL:
+        if: ${{ needs.paths-filter.outputs.sql == 'true' && github.event.pull_request.merged == true }}
+        runs-on: windows-latest
+        needs:
+            - paths-filter
+            - setup-env-vars
+            - SQL-Data-Seed
+        env:
+            ARTIFACT_NAME: sql-build
+            ENVIRONMENT_PREFIX: ${{ needs.setup-env-vars.outputs.ENVIRONMENT_PREFIX }}
+            PROFILE_PATH: sql/profiles
+            STORAGE_ACCOUNT: ${{ needs.setup-env-vars.outputs.STORAGE_ACCOUNT }}
+            SA_RG: ${{ needs.setup-env-vars.outputs.SA_RG }}
+            AZURE_CREDENTIALS: ${{ needs.setup-env-vars.outputs.AZURE_CREDENTIALS }}
+            CI_ID: ${{ needs.setup-env-vars.outputs.CI_ID }}
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Getting packages to deploy
+              uses: dawidd6/action-download-artifact@v2
+              with:
+                  # pr: ${{github.event.pull_request.number}}
+                  run_id: ${{ env.CI_ID }}
+                  workflow: ci.yml
+                  name: ${{ env.ARTIFACT_NAME }}
+                  path: ${{ github.workspace }}/build/${{ env.ARTIFACT_NAME }}
+
+            - id: sql-login
+              name: Adquiring SQL Access Token
+              uses: ./.github/actions/azure-resource-login
+              with:
+                  creds: ${{ secrets[env.AZURE_CREDENTIALS] }}
+                  resource-url: "https://database.windows.net"
+
+            - id: mgnt-login
+              name: Acquiring Azure Resource Management Access Token
+              uses: ./.github/actions/azure-resource-login
+              with:
+                  creds: ${{ secrets[env.AZURE_CREDENTIALS] }}
+                  client_id: ${{ secrets.AZURE_CLIENT_ID }}
+                  client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+                  resource-url: "https://management.core.windows.net/"
+
+            - id: database-snapshot
+              name: Taking a restore point on target database
+              uses: ./.github/actions/synapse-snapshot
+              with:
+                  profile: ${{ github.workspace }}/${{ env.PROFILE_PATH }}/${{ env.ENVIRONMENT_PREFIX }}.profile.xml
+                  authtoken: ${{ steps.mgnt-login.outputs.token }}
+                  synapse-workspace: true
+
+            - id: deploy-target
+              name: Deploying changes to target
+              uses: ./.github/actions/run-sqlpackage
+              with:
+                  action: "Publish"
+                  sourcepath: ${{ github.workspace }}/build/${{ env.ARTIFACT_NAME }}
+                  profile: ${{ github.workspace }}/${{ env.PROFILE_PATH }}/${{ env.ENVIRONMENT_PREFIX }}.profile.xml
+                  authtoken: ${{ steps.sql-login.outputs.token }}
+
+  
+
+    ######################
+    #     ADF CD Job     #
+    ######################
+    Deploy-ADF:
+        defaults:
+            run:
+              working-directory: adf
+        runs-on: ubuntu-latest
+        needs:
+            - paths-filter
+            - setup-env-vars
+            - Deploy-SQL
+        env:
+            ARTIFACTS_NAME: ArmTemplate
+            ENVIRONMENT_PREFIX: ${{ needs.setup-env-vars.outputs.ENVIRONMENT_PREFIX }}
+            RESOURCE_GROUP_NAME: ${{ needs.setup-env-vars.outputs.ADF_RG }}
+            FACTORY_NAME: ${{ needs.setup-env-vars.outputs.ADF_NAME }}
+            SUBSCRIPTION_ID: ${{ needs.setup-env-vars.outputs.SUBSCRIPTION_ID }}
+            AZURE_CREDENTIALS: ${{ needs.setup-env-vars.outputs.AZURE_CREDENTIALS }}
+            CI_ID: ${{ needs.setup-env-vars.outputs.CI_ID }}
+
+        if: ${{  always() && needs.paths-filter.outputs.adf == 'true'  && github.event.pull_request.merged == true && !(contains(needs.Deploy-SQL.result, 'failure')) }}
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Get ARM Template
+              uses: dawidd6/action-download-artifact@v2
+              with:
+                  # pr: ${{github.event.pull_request.number}}
+                  run_id: ${{ env.CI_ID }}
+                  workflow: ci.yml
+                  name: ${{ env.ARTIFACTS_NAME }}
+                  path: ${{ env.ARTIFACTS_NAME }}
+            
+            - name: Login to Azure Subscription
+              uses: Azure/login@v1 
+              with: 
+                creds: ${{ secrets[env.AZURE_CREDENTIALS] }}
+                enable-AzPSSession: true
+
+            - name: Pre-Deployment Script
+              uses: azure/powershell@v1
+              with:
+                inlineScript: ./scripts/actions/adf/cicd.ps1 -armTemplate "./${{ env.ARTIFACTS_NAME }}/ArmTemplate/ARMTemplateForFactory.json" -ResourceGroupName ${{ env.RESOURCE_GROUP_NAME }} -DataFactoryName ${{ env.FACTORY_NAME }} -predeployment $true -deleteDeployment $false -environment ${{ env.ENVIRONMENT_PREFIX }}
+                azPSVersion: 'latest'
+
+            - name: Deploy ARM Template
+              uses: azure/CLI@v1
+              with:
+                inlineScript: |
+                  az deployment group create \
+                  --name ArmTemplateForFactory-Transformation \
+                  --resource-group ${{ env.RESOURCE_GROUP_NAME }} \
+                  --template-file ./${{ env.ARTIFACTS_NAME }}/ArmTemplate/ARMTemplateForFactory.json \
+                  --parameters @./${{ env.ARTIFACTS_NAME }}/arm-template-parameters.${{ env.ENVIRONMENT_PREFIX }}.json
+          
+            - name: Post-Deployment Script
+              uses: azure/powershell@v1
+              with:
+                inlineScript: ./scripts/actions/adf/cicd.ps1 -armTemplate "./${{ env.ARTIFACTS_NAME }}/ArmTemplate/ARMTemplateForFactory.json" -ResourceGroupName ${{ env.RESOURCE_GROUP_NAME }} -DataFactoryName ${{ env.FACTORY_NAME }} -predeployment $false -deleteDeployment $true -environment ${{ env.ENVIRONMENT_PREFIX }}
+                azPSVersion: 'latest' #updated the version to latest

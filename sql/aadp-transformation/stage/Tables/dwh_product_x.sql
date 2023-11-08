@@ -1,0 +1,86 @@
+/****** Object:  Table [stage].[dwh_product_x]    Script Date: 4/20/2022 10:25:00 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [stage].[dwh_product_x]
+(
+	[dcs_code] [nvarchar](max) NULL,
+	[dcs_name] [nvarchar](max) NULL,
+	[description1] [nvarchar](max) NULL,
+	[description2] [nvarchar](max) NULL,
+	[merge_code] [nvarchar](max) NULL,
+	[merge_code_desc] [nvarchar](max) NULL,
+	[active] [nvarchar](max) NULL,
+	[category] [nvarchar](max) NULL,
+	[sub_category] [nvarchar](max) NULL,
+	[kit_category] [nvarchar](max) NULL,
+	[size] [nvarchar](max) NULL,
+	[discontinuation_date] [nvarchar](max) NULL,
+	[pack_size] [int] NULL,
+	[EAN] [nvarchar](max) NULL,
+	[sub_specific] [nvarchar](max) NULL,
+	[write_off] [nvarchar](max) NULL,
+	[ss_only] [nvarchar](max) NULL,
+	[keyI1] [nvarchar](max) NULL,
+	[keyI2] [nvarchar](max) NULL,
+	[keyI3] [nvarchar](max) NULL,
+	[DG] [nvarchar](max) NULL,
+	[pricelist_category] [nvarchar](max) NULL,
+	[pricelist_sub_category] [nvarchar](max) NULL,
+	[base_sku] [nvarchar](max) NULL,
+	[product_type_cat] [nvarchar](max) NULL,
+	[product_type_sub_cat] [nvarchar](max) NULL,
+	[status] [nvarchar](max) NULL,
+	[item_class] [nvarchar](max) NULL,
+	[item_sub_class] [nvarchar](max) NULL,
+	[last_updated_date] [nvarchar](max) NULL,
+	[netsuite_id] [nvarchar](max) NULL,
+	[is_lot_numbered] [nvarchar](max) NULL,
+	[tmall_tax_code] [nvarchar](max) NULL,
+	[barcode_type] [nvarchar](max) NULL,
+	[item_form] [nvarchar](max) NULL,
+	[short_description] [nvarchar](max) NULL,
+	[display_name] [nvarchar](max) NULL,
+	[dg_class] [nvarchar](max) NULL,
+	[dg_packing_group] [nvarchar](max) NULL,
+	[dg_un_number] [nvarchar](max) NULL,
+	[container] [nvarchar](max) NULL,
+	[full_carton_weight] [real] NULL,
+	[inner_carton] [int] NULL,
+	[item_gross_weight] [real] NULL,
+	[item_net_weight] [real] NULL,
+	[item_unit] [nvarchar](max) NULL,
+	[outer_carton] [int] NULL,
+	[packed_unit_volume] [real] NULL,
+	[packed_unit_weight] [real] NULL,
+	[product_depth] [real] NULL,
+	[product_height] [real] NULL,
+	[product_width] [real] NULL,
+	[unit] [int] NULL,
+	[export_pallet] [int] NULL,
+	[fda_code] [nvarchar](max) NULL,
+	[hs_code] [nvarchar](max) NULL,
+	[country_of_origin] [nvarchar](max) NULL,
+	[standard_pallet] [int] NULL,
+	[voc_percentage] [real] NULL,
+	[synced_from_ns] [nvarchar](max) NULL,
+	[commodity_code] [nvarchar](max) NULL,
+	[shipper_width] [real] NULL,
+	[shipper_height] [real] NULL,
+	[shipper_depth] [real] NULL,
+	[tax_schedule] [nvarchar](max) NULL,
+	[send_to_wms] [nvarchar](max) NULL,
+	[netsuite_updated_date] [nvarchar](max) NULL,
+	[md_record_ingestion_timestamp] [nvarchar](max) NULL,
+	[md_record_ingestion_pipeline_id] [nvarchar](max) NULL,
+	[md_source_system] [nvarchar](max) NULL
+)
+WITH
+(
+	DISTRIBUTION = ROUND_ROBIN,
+	HEAP
+)
+GO

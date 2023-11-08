@@ -1,0 +1,28 @@
+{
+	"name": "AADP_TRANS_TR_UC47_1_CONS_LOAD",
+	"properties": {
+		"description": "UC47_1 consumption layer load",
+		"annotations": ["dev","prod","sit","uat"],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7003"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-06-02T08:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

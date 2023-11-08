@@ -1,0 +1,10 @@
+{
+	"name": "LS_AKV_SECURITY",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://aesaeiadpdeappkvt001.vault.azure.net/"
+		}
+	}
+}

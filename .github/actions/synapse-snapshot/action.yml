@@ -1,0 +1,43 @@
+name: 'Taking a restore point on target database'
+description: 'Takes a restore point on the target database'
+inputs:
+  resource-group:
+    description: 'Resource group where the database is located'
+    required: true
+  database-server:
+    description: 'Target database server name. If a publishing profile is indicated with the value, this can be ignored'
+    required: false
+  database-name:
+    description: 'Database name. If a publishing profile is indicated with the value, this can be ignored'
+    required: false
+  profile:
+    description: 'Publishing profile to use. If both database server and database name have been specified, this can be ignored'
+    required: false
+    default: ''
+  label:
+    description: 'Restore point label. Defaults to the GitHub action run ID'
+    required: false
+    default: 'cicd-job-${{ github.run_id }}'
+  authtoken:
+    description: 'Authentication token to execute the operation'
+    required: true
+  synapse-workspace:
+    description: 'True if the target database is a Synapse Analytics workspace'
+    required: false
+    default: true
+runs:
+  using: "composite"
+  steps:
+    - id: database-snapshot
+      name: Creating a restore point
+      shell: pwsh
+      run: |
+        ${{ github.workspace }}/scripts/actions/synapse-snapshot/New-AzSynapseRestorePoint.ps1  `
+                                -ResourceGroup "${{ inputs.resource-group }}"  `
+                                -PublishingProfilePath "${{ inputs.profile }}"  `
+                                -DatabaseServer "${{ inputs.database-server }}"  `
+                                -DatabaseName "${{ inputs.database-name }}" `
+                                -AuthToken "${{ inputs.authtoken }}" `
+                                -Label "${{ inputs.label }}" `
+                                -SynapseWorkspace ${{ '$' }}${{ inputs.synapse-workspace }} `
+                                -Platform "github"

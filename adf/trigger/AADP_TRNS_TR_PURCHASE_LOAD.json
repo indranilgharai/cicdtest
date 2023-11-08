@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_PURCHASE_LOAD",
+	"properties": {
+		"description": "Purchase record and Purchase record Line Item Load to Std Layer\nDependent UC - 15/43",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 4,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-04-07T15:45:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

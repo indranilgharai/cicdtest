@@ -1,0 +1,112 @@
+{
+	"name": "AADP_TFM_DATA_PROFILING_SP",
+	"properties": {
+		"description": "Pipeline to trigger the SP for data profiling and loading table: std.data_profiling with profiling data and table: meta_audit.data_profiling_log_sp with the log for the run",
+		"activities": [
+			{
+				"name": "DataProfilingSP",
+				"description": "Data Profiling SP for fetching the profiling data of critical data elements of few tables",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.07:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[std].[sp_data_profiling]"
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_SYNAPSE_DWH",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "GetJobStatus",
+				"description": "Lookup block to check the job status from table: meta_audit.data_profiling_log_sp",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "DataProfilingSP",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.07:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderQuery": {
+							"value": "select SP_Status from meta_audit.data_profiling_log_sp where Updated_Date=(select max(Updated_Date) from meta_audit.data_profiling_log_sp)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "JobStatusCheck",
+				"description": "If the SP: sp_data_profiling has succeeded then pipeline will be successful else pipeline should fail",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetJobStatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(activity('GetJobStatus').output.firstrow.SP_Status,'SUCCESS')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "JobStatus_FAIL",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Job execution Failed",
+								"errorCode": "0000000"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "JobStatus_SUCCESS",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "AADP_TRANSFORMATION_PIPELINE"
+		},
+		"annotations": []
+	}
+}

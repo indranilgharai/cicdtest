@@ -1,0 +1,41 @@
+{
+	"name": "AADP_TRANS_TR_WORKDAY_LOAD",
+	"properties": {
+		"description": "to load std.workday_employeedata",
+		"annotations": [
+			"dev",
+			"prod"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7023"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-01-30T00:00:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						30
+					],
+					"hours": [
+						7,
+						15,
+						23
+					]
+				}
+			}
+		}
+	}
+}

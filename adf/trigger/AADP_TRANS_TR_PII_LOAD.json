@@ -1,0 +1,27 @@
+{
+	"name": "AADP_TRANS_TR_PII_LOAD",
+	"properties": {
+		"annotations": ["dev","prod","sit","uat"],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7005"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-04-26T15:00:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

@@ -1,0 +1,76 @@
+name: 'Running SqlPackage command'
+description: 'Runs a SqlPackage command'
+inputs:
+  action:
+    description: 'Action parameter to run with SqlPackage. Supported values: Publish, DeployReport, DriftReport, Script'
+    required: true
+  sourcepath:
+    description: 'The path where to look for the DACPAC file'
+    required: true
+  profile:
+    description: 'The profile path to use during the execution. It has to be an xml file'
+    required: true
+  database-server:
+    description: 'Database server URL (without protocol). If missing it has to be indicated in the profile file'
+    required: false
+    default: ''
+  database-name:
+    description: 'Database name. If missing it has to be indicated in the profile file'
+    required: false
+    default: ''
+  authtoken:
+    description: 'The authentication token used to connect to the database, if credentials not indicated in the connection string'
+    required: true
+  outputpath:
+    description: 'The output folder where assets will be generated if any'
+    required: false
+    default: .
+  outputfile:
+    description: 'The output file name. The final name of the file will be [dacpac_name].[outputfile]'
+    required: false
+    default: 'deployreport.xml' 
+runs:
+  using: "composite"
+  steps:
+    - name: get sqlpackage version
+      working-directory: C:\Program Files\Microsoft SQL Server\160\DAC\bin\
+      shell: pwsh
+      run: ./sqlpackage.exe /version
+
+    - id: deploy-report
+      name: Identifying proposed changes
+      working-directory: C:\Program Files\Microsoft SQL Server\160\DAC\bin\
+      shell: bash
+      run: |
+        echo "::debug::Ensuring target folder '${{ inputs.profile }}'"
+        mkdir -p ${{ inputs.outputpath }}
+        
+        echo "::debug::Looking for dacpac files at '${{ inputs.sourcepath }}'"
+        PACKAGE_PATHS=$(find $(cygpath -w "${{ inputs.sourcepath }}") -name '*.dacpac' -exec basename {} \;)
+
+        for PACKAGE in $PACKAGE_PATHS
+        do
+          echo "::debug::Runing ${{ inputs.action }} on package $PACKAGE"
+          source_path=$(cygpath -w "${{ inputs.sourcepath }}/$PACKAGE")
+          profile_path=$(cygpath -w "${{ inputs.profile }}")
+          SQLPACKAGE_CMD="""./sqlpackage.exe /Action:${{ inputs.action }} /SourceFile:'$source_path' /Profile:'$profile_path' /AccessToken:${{ inputs.authtoken }}"""
+          
+          if [[ '${{ inputs.database-server }}' != '' ]]; then
+            SQLPACKAGE_CMD="$SQLPACKAGE_CMD \
+              /TargetServerName:${{ inputs.database-server }}"
+          fi
+
+          if [[ '${{ inputs.database-name }}' != '' ]]; then
+            SQLPACKAGE_CMD="$SQLPACKAGE_CMD \
+              /TargetDatabaseName:${{ inputs.database-name }}"
+          fi
+
+          if [[ '${{ inputs.action }}' != 'Publish' ]]; then
+            PACKAGE_NAME="${PACKAGE%.*}"
+            output_path=$(cygpath -w "${{ inputs.outputpath }}/$PACKAGE_NAME.${{ inputs.outputfile }}")
+            SQLPACKAGE_CMD="""$SQLPACKAGE_CMD /OutputPath:'$output_path' /OverwriteFiles:True"""
+          fi
+
+          echo "::debug::SqlPackage intruction is '$SQLPACKAGE_CMD'"
+          eval $SQLPACKAGE_CMD
+        done

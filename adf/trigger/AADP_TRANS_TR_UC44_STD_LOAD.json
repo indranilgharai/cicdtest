@@ -1,0 +1,33 @@
+{
+	"name": "AADP_TRANS_TR_UC44_STD_LOAD",
+	"properties": {
+		"description": "STD load for UC44",
+		"annotations": [
+			"dev",
+			"prod",
+			"sit",
+			"uat"
+		],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7006"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-05-06T20:30:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

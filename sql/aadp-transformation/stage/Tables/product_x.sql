@@ -1,0 +1,82 @@
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [stage].[product_x]
+(
+	[dcs_code] [varchar](100) NULL,
+	[dcs_name] [varchar](100) NULL,
+	[description1] [varchar](100) NULL,
+	[description2] [varchar](100) NULL,
+	[merge_code] [varchar](100) NULL,
+	[merge_code_desc] [varchar](100) NULL,
+	[active] [varchar](100) NULL,
+	[category] [varchar](100) NULL,
+	[sub_category] [varchar](100) NULL,
+	[kit_category] [varchar](100) NULL,
+	[size] [varchar](100) NULL,
+	[discontinuation_date] [varchar](100) NULL,
+	[pack_size] [varchar](100) NULL,
+	[EAN] [varchar](100) NULL,
+	[sub_specific] [varchar](100) NULL,
+	[write_off] [varchar](100) NULL,
+	[ss_only] [varchar](100) NULL,
+	[keyI1] [varchar](100) NULL,
+	[keyI2] [varchar](100) NULL,
+	[keyI3] [varchar](100) NULL,
+	[DG] [varchar](100) NULL,
+	[pricelist_category] [varchar](100) NULL,
+	[pricelist_sub_category] [varchar](100) NULL,
+	[base_sku] [varchar](100) NULL,
+	[product_type_cat] [varchar](100) NULL,
+	[product_type_sub_cat] [varchar](100) NULL,
+	[status] [varchar](100) NULL,
+	[item_class] [varchar](100) NULL,
+	[item_sub_class] [varchar](100) NULL,
+	[last_updated_date] [varchar](100) NULL,
+	[netsuite_id] [varchar](100) NULL,
+	[is_lot_numbered] [varchar](100) NULL,
+	[tmall_tax_code] [varchar](100) NULL,
+	[barcode_type] [varchar](100) NULL,
+	[item_form] [varchar](100) NULL,
+	[short_description] [varchar](100) NULL,
+	[display_name] [varchar](100) NULL,
+	[dg_class] [varchar](100) NULL,
+	[dg_packing_group] [varchar](100) NULL,
+	[dg_un_number] [varchar](100) NULL,
+	[container] [varchar](100) NULL,
+	[full_carton_weight] [varchar](100) NULL,
+	[inner_carton] [varchar](100) NULL,
+	[item_gross_weight] [varchar](100) NULL,
+	[item_net_weight] [varchar](100) NULL,
+	[item_unit] [varchar](100) NULL,
+	[outer_carton] [varchar](100) NULL,
+	[packed_unit_volume] [varchar](100) NULL,
+	[packed_unit_weight] [varchar](100) NULL,
+	[product_depth] [varchar](100) NULL,
+	[product_height] [varchar](100) NULL,
+	[product_width] [varchar](100) NULL,
+	[unit] [varchar](100) NULL,
+	[export_pallet] [varchar](100) NULL,
+	[fda_code] [varchar](100) NULL,
+	[hs_code] [varchar](100) NULL,
+	[country_of_origin] [varchar](100) NULL,
+	[standard_pallet] [varchar](100) NULL,
+	[voc_percentage] [varchar](100) NULL,
+	[synced_from_ns] [varchar](100) NULL,
+	[commodity_code] [varchar](100) NULL,
+	[shipper_width] [varchar](100) NULL,
+	[shipper_height] [varchar](100) NULL,
+	[shipper_depth] [varchar](100) NULL,
+	[tax_schedule] [varchar](100) NULL,
+	[send_to_wms] [varchar](100) NULL,
+	[netsuite_updated_date] [varchar](100) NULL
+)
+WITH
+(
+	DISTRIBUTION = ROUND_ROBIN,
+	CLUSTERED COLUMNSTORE INDEX
+)
+GO

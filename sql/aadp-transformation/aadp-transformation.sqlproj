@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">
+			Debug
+		</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">
+			AnyCPU
+		</Platform>
+    <Name>
+			aadp-ingestion
+		</Name>
+    <SchemaVersion>
+			2.0
+		</SchemaVersion>
+    <ProjectVersion>
+			4.1
+		</ProjectVersion>
+    <ProjectGuid>
+			{1CBF9134-EF6F-4D6D-8426-8DC37F69D638}
+		</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlDwDatabaseSchemaProvider</DSP>
+    <OutputType>
+			Database
+		</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>
+			aadp-ingestion
+		</RootNamespace>
+    <AssemblyName>
+			aadp-ingestion
+		</AssemblyName>
+    <ModelCollation>
+			1033, CI
+		</ModelCollation>
+    <DefaultFileStructure>
+			BySchemaAndSchemaType
+		</DefaultFileStructure>
+    <DeployToDatabase>
+			True
+		</DeployToDatabase>
+    <TargetFrameworkVersion>
+			net5.*
+		</TargetFrameworkVersion>
+    <TargetLanguage>
+			CS
+		</TargetLanguage>
+    <AppDesignerFolder>
+			Properties
+		</AppDesignerFolder>
+    <SqlServerVerification>
+			False
+		</SqlServerVerification>
+    <IncludeCompositeObjects>
+			True
+		</IncludeCompositeObjects>
+    <TargetDatabaseSet>
+			True
+		</TargetDatabaseSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>
+			bin\Release\
+		</OutputPath>
+    <BuildScriptName>
+			$(MSBuildProjectName).sql
+		</BuildScriptName>
+    <TreatWarningsAsErrors>
+			False
+		</TreatWarningsAsErrors>
+    <DebugType>
+			pdbonly
+		</DebugType>
+    <Optimize>
+			true
+		</Optimize>
+    <DefineDebug>
+			false
+		</DefineDebug>
+    <DefineTrace>
+			true
+		</DefineTrace>
+    <ErrorReport>
+			prompt
+		</ErrorReport>
+    <WarningLevel>
+			4
+		</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>
+			bin\Debug\
+		</OutputPath>
+    <BuildScriptName>
+			$(MSBuildProjectName).sql
+		</BuildScriptName>
+    <TreatWarningsAsErrors>
+			false
+		</TreatWarningsAsErrors>
+    <DebugSymbols>
+			true
+		</DebugSymbols>
+    <DebugType>
+			full
+		</DebugType>
+    <Optimize>
+			false
+		</Optimize>
+    <DefineDebug>
+			true
+		</DefineDebug>
+    <DefineTrace>
+			true
+		</DefineTrace>
+    <ErrorReport>
+			prompt
+		</ErrorReport>
+    <WarningLevel>
+			4
+		</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">
+			11.0
+		</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">
+			True
+		</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">
+			11.0
+		</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(NetCoreBuild)' == 'true'" Project="$(NETCoreTargetsPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(NetCoreBuild)' != 'true' AND '$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(NetCoreBuild)' != 'true' AND '$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <PackageReference Condition="'$(NetCoreBuild)' == 'true'" Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Security\" />
+    <Folder Include="Security\Schemas\" />
+    <Folder Include="Scripts\" />
+    <Folder Include="Scripts\PreDeployment\" />
+    <Folder Include="Scripts\PostDeployment\" />
+    <Folder Include="meta_audit\" />
+    <Folder Include="meta_audit\StoredProcedures\" />
+    <Folder Include="meta\" />
+    <Folder Include="meta\Tables\" />
+    <Folder Include="stage\" />
+    <Folder Include="std\" />
+    <Folder Include="stage\Tables\" />
+    <Folder Include="stage\StoredProcedures\" />
+    <Folder Include="std\StoredProcedures\" />
+    <Folder Include="std\Tables\" />
+    <Folder Include="cons_customer\StoredProcedures\" />
+    <Folder Include="cons_reference\" />
+    <Folder Include="cons_reference\StoredProcedures\" />
+    <Folder Include="cons_reference\Views\" />
+    <Folder Include="cons_customer\Tables\" />
+    <Folder Include="meta_ctl\" />
+    <Folder Include="meta_ctl\Tables\" />
+    <Folder Include="meta_audit\Tables\" />
+  </ItemGroup>
+  <Target Name="BeforeBuild">
+    <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
+  </Target>
+  <ItemGroup>
+    <Build Include="stage\Tables\line_item_cegid_hybris.sql" />
+    <Build Include="stage\Tables\purchase_record_cegid_hybris.sql" />
+    <Build Include="std\Tables\date_dim.sql" />
+    <Build Include="std\Tables\exchange_rate_x.sql" />
+    <Build Include="std\Tables\fps_person_alias.sql" />
+    <Build Include="std\Tables\product_x.sql" />
+    <Build Include="std\Tables\purchase_record.sql" />
+    <Build Include="std\Tables\purchase_record_del.sql" />
+    <Build Include="std\Tables\purchase_record_history.sql" />
+    <Build Include="std\Tables\purchase_record_line_item.sql" />
+    <Build Include="std\Tables\purchase_record_line_item_del.sql" />
+    <Build Include="std\Tables\purchase_record_line_item_history.sql" />
+    <Build Include="std\Tables\sfmc_bounce.sql" />
+    <Build Include="std\Tables\sfmc_click.sql" />
+    <Build Include="std\Tables\sfmc_complaint.sql" />
+    <Build Include="std\Tables\sfmc_job.sql" />
+    <Build Include="std\Tables\sfmc_customer.sql" />
+    <Build Include="std\Tables\sfmc_journey.sql" />
+    <Build Include="std\Tables\sfmc_journeyactivity.sql" />
+    <Build Include="std\Tables\sfmc_open.sql" />
+    <Build Include="std\Tables\sfmc_person.sql" />
+    <Build Include="std\Tables\sfmc_sent.sql" />
+    <Build Include="std\Tables\sfmc_subscribers.sql" />
+    <Build Include="std\Tables\sfmc_svoc.sql" />
+    <Build Include="std\Tables\sfmc_unsubscribe.sql" />
+    <Build Include="std\Tables\store_x.sql" />
+    <Build Include="std\Tables\subsidiary_x.sql" />
+    <Build Include="std\Tables\time_dim.sql" />
+    <Build Include="std\Tables\customer_discount_group.sql" />
+    <Build Include="std\Tables\payment_transaction.sql" />
+    <Build Include="cons_customer\Tables\customer_profile.sql" />
+    <Build Include="cons_customer\Tables\sales_detail_time.sql" />
+    <Build Include="cons_customer\StoredProcedures\sp_customer_profile.sql" />
+    <Build Include="cons_customer\StoredProcedures\sp_sales_detail_time.sql" />
+    <Build Include="cons_customer\Tables\customer_profile_temp.sql" />
+    <Build Include="cons_customer\Tables\sales_detail_time_temp.sql" />
+    <Build Include="cons_reference\Views\exchange_rate_x_view.sql"/>
+    <Build Include="cons_reference\Views\product_x_view.sql"/>
+    <Build Include="cons_reference\Views\store_x_view.sql"/>
+    <Build Include="cons_reference\Views\subsidiary_x_view.sql"/>
+    <Build Include="stage\StoredProcedures\sp_line_item_cegid_hybris.sql" />
+    <Build Include="stage\StoredProcedures\sp_purchase_record_cegid_hybris.sql" />
+    <Build Include="meta_audit\StoredProcedures\sp_tfm_wrapper.sql" />
+    <Build Include="meta_audit\Tables\transform_error_log_sp.sql" />
+    <Build Include="meta_audit\Tables\transform_error_log_wsp.sql" />
+    <Build Include="std\StoredProcedures\sp_date_dim.sql" />
+    <Build Include="std\StoredProcedures\sp_fps_person_alias.sql" />
+    <Build Include="std\StoredProcedures\sp_purchase_record_line_item.sql" />
+    <Build Include="std\StoredProcedures\sp_purchase_record.sql" />
+    <Build Include="std\StoredProcedures\sp_time_dim.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_customer.sql" />
+    <Build Include="std\StoredProcedures\sp_ref_subsidiary_x_load.sql" />
+    <Build Include="std\StoredProcedures\sp_ref_store_x_load.sql" />
+    <Build Include="std\StoredProcedures\sp_ref_product_x_load.sql" />
+    <Build Include="std\StoredProcedures\sp_ref_exchange_rate_x_load.sql" />
+    <Build Include="std\StoredProcedures\sp_customer_discount_group.sql" />
+    <Build Include="std\StoredProcedures\sp_stage_truncate.sql" />
+    <Build Include="std\StoredProcedures\sp_payment_transaction.sql" />
+    <Build Include="stage\Tables\cegid_order.sql" />
+    <Build Include="stage\Tables\cegid_order_payments.sql" />
+    <Build Include="stage\Tables\exchange_rate_x.sql" />
+    <Build Include="stage\Tables\fps_alias.sql" />
+    <Build Include="stage\Tables\fps_person.sql" />
+    <Build Include="stage\Tables\hybris_order_api.sql" />
+    <Build Include="stage\Tables\product_x.sql" />
+    <Build Include="stage\Tables\sfmc_svoc.sql" />
+    <Build Include="stage\Tables\sfmc_bounce.sql" />
+    <Build Include="stage\Tables\sfmc_click.sql" />
+    <Build Include="stage\Tables\sfmc_complaint.sql" />
+    <Build Include="stage\Tables\sfmc_job.sql" />
+    <Build Include="stage\Tables\sfmc_journey.sql" />
+    <Build Include="stage\Tables\sfmc_journeyactivity.sql" />
+    <Build Include="stage\Tables\sfmc_open.sql" />
+    <Build Include="stage\Tables\sfmc_person.sql" />
+    <Build Include="stage\Tables\sfmc_sent.sql" />
+    <Build Include="stage\Tables\sfmc_subscribers.sql" />
+    <Build Include="stage\Tables\sfmc_unsubscribe.sql" />
+    <Build Include="stage\Tables\store_x.sql" />
+    <Build Include="stage\Tables\subsidiary_x.sql" />
+    <Build Include="stage\Tables\number_increment.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_bounce.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_click.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_complaint.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_job.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_journey.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_journeyactivity.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_open.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_person.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_sent.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_subscribers.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_svoc.sql" />
+    <Build Include="std\StoredProcedures\sp_sfmc_unsubscribe.sql" />
+    <Build Include="Security\SqlRoleMembership.sql" />
+    <Build Include="Security\etl_user_1.sql" />
+    <Build Include="Security\etl_user.sql" />
+    <Build Include="Security\dq_user_1.sql" />
+    <Build Include="Security\dq_user.sql" />
+    <Build Include="Security\dq.sql" />
+    <Build Include="Security\AzureAD ADP Dev DataEngineer.sql" />
+    <Build Include="Security\aadp_meta_audit.sql" />
+    <Build Include="Security\aadp_meta_ctl.sql" />
+    <Build Include="Security\Schemas\stage.sql" />
+    <Build Include="Security\Schemas\std.sql" />
+    <Build Include="Security\Schemas\meta_ctl.sql" />
+    <Build Include="Security\Schemas\cons_customer.sql" />
+    <Build Include="Security\Schemas\cons_reference.sql" />
+    <Build Include="Security\Schemas\meta_audit.sql" />
+    <Build Include="meta_ctl\Tables\transform_count_record_table.sql" />
+    <Build Include="meta_ctl\Tables\transform_job_master.sql" />
+    <Build Include="meta_ctl\Tables\transform_job_steps.sql" />
+    <Build Include="meta_ctl\Tables\transform_job_control.sql" />
+    <Build Include="meta_ctl\StoredProcedures\sp_row_count.sql" />
+    <Build Include="meta_audit\Tables\transform_error_log_sp.sql" />
+    <Build Include="meta_audit\Tables\transform_error_log_wsp.sql" />
+    <Build Include="meta_audit\Tables\transform_job_stats.sql" />
+    <Build Include="meta_audit\Tables\transform_job_step_stats.sql" />
+    <Build Include="Security\Schemas\meta_ctl.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="Scripts\PreDeployment\begin_transaction.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\PostDeployment\external_tables.sql" />
+  </ItemGroup>
+</Project>

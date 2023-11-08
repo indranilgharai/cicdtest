@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_UC44_CONS_LOAD",
+	"properties": {
+		"description": "Inventory Report consumption layer load",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 12,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-05-06T22:00:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

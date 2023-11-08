@@ -1,0 +1,42 @@
+{
+	"name": "AzureSynapseAnalyticsTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SYNAPSE_DWH",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "job_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "job_start_time",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "job_end_time",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "job_status",
+				"type": "varchar"
+			},
+			{
+				"name": "log_message",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "meta",
+			"table": "transformation_job_stats"
+		}
+	}
+}

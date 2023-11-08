@@ -1,0 +1,28 @@
+{
+	"name": "AADP_TRANS_TR_FPS_LOAD",
+	"properties": {
+		"description": "FPS tables -fps_person and fps_alias load to Std layer",
+		"annotations": ["dev","prod","sit","uat"],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_MAIN",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"BatchID": "7002"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Hour",
+				"interval": 24,
+				"startTime": "2022-04-26T15:00:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

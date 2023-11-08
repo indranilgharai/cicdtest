@@ -1,0 +1,29 @@
+{
+	"name": "AADP_TRNS_TR_UC40_41_STD_LOAD",
+	"properties": {
+		"description": "To load all the STD tables related to UC 40-41",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "AADP_TFM_WRAPPER_SP",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"job_id": 9,
+					"reset": 0
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-05-06T20:00:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}

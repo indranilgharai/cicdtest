@@ -1,0 +1,103 @@
+{
+	"name": "AADP_TFM_STAGE",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetStageLists",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.10:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlDWSource",
+						"sqlReaderStoredProcedureName": "[meta_audit].[sp_transform_get_stage_list]",
+						"storedProcedureParameters": {
+							"BatchID": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.BatchID",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Process Stage",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetStageLists",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetStageLists').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Execute Job",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "AADP_TFM_JOB",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"BatchID": {
+										"value": "@pipeline().parameters.BatchID",
+										"type": "Expression"
+									},
+									"stage_number": {
+										"value": "@item().stage_number",
+										"type": "Expression"
+									},
+									"PipelineID": {
+										"value": "@pipeline().parameters.PipelineID",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"BatchID": {
+				"type": "string"
+			},
+			"PipelineID": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "AADP_TRANSFORMATION_PIPELINE"
+		},
+		"annotations": []
+	}
+}
