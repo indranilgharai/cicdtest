@@ -2,6 +2,7 @@
 	"name": "AADP_TFM_EACH_JOB",
 	"properties": {
 		"activities": [
+
 			{
 				"name": "Process Job",
 				"type": "Lookup",
@@ -71,6 +72,7 @@
 					}
 				}
 			},
+			
 			{
 				"name": "Initialise Log",
 				"type": "SqlServerStoredProcedure",
